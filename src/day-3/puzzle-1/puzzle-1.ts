@@ -1,113 +1,164 @@
-export function Day3Puzzle1(input: string) {
-  const cleanedInput = input.replaceAll(" ", "");
-  const { numbers, symbols } = getNumbersAndSymbolsPositions(cleanedInput);
+import { GridPosition } from "../types";
 
-  console.log(numbers, symbols);
-  const validNumbers: Array<number> = [];
-
-  numbers.forEach((n) => {
-    const startIndex = n.XPosition;
-    const endIndex = n.XPosition + n.value.length - 1;
-
-    for (let index = 0; index < symbols.length; index++) {
-      const symbol = symbols[index];
-
-      // Horizontals
-      if (symbol.YPosition === n.YPosition) {
-        if (
-          symbol.XPosition === startIndex - 1 ||
-          symbol.XPosition === endIndex + 1
-        ) {
-          validNumbers.push(parseInt(n.value));
-          break;
-        }
-      }
-
-      // Diagonals && Verticals
-      if (
-        symbol.YPosition === n.YPosition + 1 ||
-        symbol.YPosition === n.YPosition - 1
-      ) {
-        if (
-          symbol.XPosition === startIndex - 1 ||
-          symbol.XPosition === endIndex + 1
-        ) {
-          validNumbers.push(parseInt(n.value));
-          break;
-        }
-
-        if (symbol.XPosition >= startIndex && symbol.XPosition <= endIndex) {
-          validNumbers.push(parseInt(n.value));
-          break;
-        }
-      }
-    }
-  });
+export function Day3Puzzle1(grid: string) {
+  const cleanedGrid = grid.replaceAll(" ", "");
+  const { numbers, symbols } = getNumbersAndSymbolsPositions(cleanedGrid);
+  const validNumbers = getValidNumbers({ numbers, symbols });
 
   return validNumbers.reduce((acc, n) => n + acc, 0);
 }
 
-function getNumbersAndSymbolsPositions(grid: string): {
-  numbers: Array<{
-    value: string;
-    XPosition: number;
-    YPosition: number;
-  }>;
-  symbols: Array<{
-    XPosition: number;
-    YPosition: number;
-  }>;
+function getValidNumbers({
+  numbers,
+  symbols,
+}: {
+  numbers: Array<GridPosition>;
+  symbols: Array<GridPosition>;
+}) {
+  const validNumbers: Array<number> = [];
+
+  numbers.forEach((n) => {
+    for (let index = 0; index < symbols.length; index++) {
+      const symbol = symbols[index];
+
+      const isValidNumber =
+        isValidOnX({ number: n, symbol }) ||
+        isValidOnY({ number: n, symbol }) ||
+        isValidOnXY({ number: n, symbol });
+
+      if (isValidNumber) {
+        validNumbers.push(parseInt(n.value));
+        break;
+      }
+    }
+  });
+
+  return validNumbers;
+}
+
+function getNumbersIndexes(number: GridPosition): {
+  startIndex: number;
+  endIndex: number;
 } {
-  const numbers: Array<{
-    value: string;
-    XPosition: number;
-    YPosition: number;
-  }> = [];
+  const startIndex = number.XPosition;
+  const endIndex = number.XPosition + number.value.length - 1;
 
-  const symbols: Array<{
-    XPosition: number;
-    YPosition: number;
-  }> = [];
+  return {
+    startIndex,
+    endIndex,
+  };
+}
 
-  const gridLines = grid.split("\n");
+function isValidOnX({
+  number,
+  symbol,
+}: {
+  number: GridPosition;
+  symbol: GridPosition;
+}) {
+  const { startIndex, endIndex } = getNumbersIndexes(number);
 
-  gridLines.forEach((line, y) => {
-    let currentNumber = "";
-    line.split("").forEach((char, x) => {
-      const parsedValue = parseInt(char);
-      if (!isNaN(parsedValue)) {
-        currentNumber = currentNumber + parsedValue;
-      } else {
-        if (currentNumber !== "") {
-          numbers.push({
-            value: currentNumber,
-            XPosition: x - currentNumber.length,
-            YPosition: y,
-          });
+  return (
+    symbol.YPosition === number.YPosition &&
+    (symbol.XPosition === startIndex - 1 || symbol.XPosition === endIndex + 1)
+  );
+}
 
-          currentNumber = "";
-        }
+function isValidOnY({
+  number,
+  symbol,
+}: {
+  number: GridPosition;
+  symbol: GridPosition;
+}) {
+  const { startIndex, endIndex } = getNumbersIndexes(number);
 
-        if (char === ".") return;
+  return (
+    (symbol.YPosition === number.YPosition + 1 ||
+      symbol.YPosition === number.YPosition - 1) &&
+    symbol.XPosition >= startIndex &&
+    symbol.XPosition <= endIndex
+  );
+}
 
-        symbols.push({
-          XPosition: x,
-          YPosition: y,
-        });
-      }
+function isValidOnXY({
+  number,
+  symbol,
+}: {
+  number: GridPosition;
+  symbol: GridPosition;
+}) {
+  const { startIndex, endIndex } = getNumbersIndexes(number);
 
-      if (x === line.length - 1 && currentNumber !== "") {
-        numbers.push({
-          value: currentNumber,
-          XPosition: x - currentNumber.length + 1,
-          YPosition: y,
-        });
-      }
-    });
+  return (
+    ((symbol.YPosition === number.YPosition + 1 ||
+      symbol.YPosition === number.YPosition - 1) &&
+      symbol.XPosition === startIndex - 1) ||
+    symbol.XPosition === endIndex + 1
+  );
+}
+
+function getNumbersAndSymbolsPositions(grid: string): {
+  numbers: Array<GridPosition>;
+  symbols: Array<GridPosition>;
+} {
+  const numbers: Array<GridPosition> = [];
+  const symbols: Array<GridPosition> = [];
+
+  grid.split("\n").forEach((line, y) => {
+    numbers.push(...getLineNumbersPositions(line, y));
+    symbols.push(...getLineSymbolsPositions(line, y));
   });
 
   return {
     numbers,
     symbols,
   };
+}
+
+function getLineNumbersPositions(line: string, YPosition: number) {
+  const positions: Array<GridPosition> = [];
+  let currentNumber = "";
+
+  line.split("").forEach((char, x) => {
+    const parsedValue = parseInt(char);
+
+    if (!isNaN(parsedValue)) {
+      currentNumber = currentNumber + parsedValue;
+    } else if (currentNumber !== "") {
+      positions.push({
+        value: currentNumber,
+        XPosition: x - currentNumber.length,
+        YPosition,
+      });
+
+      currentNumber = "";
+    }
+
+    if (x === line.length - 1 && currentNumber !== "") {
+      positions.push({
+        value: currentNumber,
+        XPosition: x - currentNumber.length + 1,
+        YPosition,
+      });
+    }
+  });
+
+  return positions;
+}
+
+function getLineSymbolsPositions(line: string, YPosition: number) {
+  const positions: Array<GridPosition> = [];
+
+  line.split("").forEach((char, x) => {
+    if (char === ".") return;
+
+    positions.push({
+      value: char,
+      XPosition: x,
+      YPosition,
+    });
+  });
+
+  return positions;
 }
