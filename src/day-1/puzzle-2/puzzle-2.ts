@@ -104,5 +104,3 @@ function getIndexOfAllSubstrings(str: string, subStr: string): number[] {
 
   return indexes;
 }
-
-console.log("Day 1 Puzzle 2 : ", Day1Puzzle2(input));

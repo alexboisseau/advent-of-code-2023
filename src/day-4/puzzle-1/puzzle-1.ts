@@ -2,8 +2,6 @@ import { ScratchCardInformation } from "../types";
 
 export function Day4Puzzle1(input: string): number {
   const scratchCardsInformation = getScratchCardsInformation(input);
-  console.log(scratchCardsInformation);
-
   const scores = scratchCardsInformation.map((i) => {
     return getScratchCardScore(i);
   });

@@ -18,5 +18,3 @@ function parseLine(line: string): number {
     return parseInt(numbersChars[0] + numbersChars[0]);
   return parseInt(numbersChars[0] + numbersChars[numbersChars.length - 1]);
 }
-
-console.log("Day 1 Puzzle 1 : ", Day1Puzzle1(input));
