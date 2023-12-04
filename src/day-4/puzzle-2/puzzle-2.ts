@@ -1,17 +1,4 @@
-/*
-[
-  {
-    information: [number[], number[]];
-    instances: 1
-  }
-]
-*/
-type ScratchCardInformation = [number[], number[]];
-
-type ScratchCard = {
-  information: ScratchCardInformation;
-  instances: number;
-};
+import { ScratchCard, ScratchCardInformation } from "../types";
 
 export function Day4Puzzle2(input: string): number {
   const scratchCards = getScratchCards(input);
@@ -74,22 +61,4 @@ function getMatchingNumbers(scratchCardInformation: ScratchCardInformation) {
 
     return acc;
   }, 0);
-}
-
-function getScratchCardScore(scratchCardInformation: ScratchCardInformation) {
-  const [winningNumbers, ourNumbers] = scratchCardInformation;
-
-  return ourNumbers.reduce(
-    (acc, n) => {
-      if (winningNumbers.includes(n)) {
-        if (acc.counter === 0) acc.score = 1;
-        else acc.score = acc.score * 2;
-
-        acc.counter = acc.counter + 1;
-      }
-
-      return acc;
-    },
-    { score: 0, counter: 0 }
-  ).score;
 }

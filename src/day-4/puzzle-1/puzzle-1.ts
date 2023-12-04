@@ -1,4 +1,4 @@
-type ScratchCardInformation = [number[], number[]];
+import { ScratchCardInformation } from "../types";
 
 export function Day4Puzzle1(input: string): number {
   const scratchCardsInformation = getScratchCardsInformation(input);
