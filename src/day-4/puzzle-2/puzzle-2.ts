@@ -9,30 +9,38 @@ export function Day4Puzzle2(input: string): number {
 
 function computeScratchCardsInstances(scratchCards: ScratchCard[]): number {
   scratchCards.forEach((scratchCard, i) => {
-    const score = getMatchingNumbers(scratchCard.information); // 1
-
-    for (let z = 1; z <= score; z++) {
-      const index = z + i;
-
-      if (scratchCards[index]) {
-        scratchCards[index].instances += scratchCard.instances;
-      }
-    }
+    const score = computeMatchingNumbers(scratchCard.information);
+    updateInstances(scratchCards, i, score, scratchCard.instances);
   });
 
-  return scratchCards.reduce((acc, s) => {
-    return acc + s.instances;
-  }, 0);
+  return scratchCards.reduce(
+    (acc, scratchCard) => acc + scratchCard.instances,
+    0
+  );
 }
 
-function getMatchingNumbers(scratchCardInformation: ScratchCardInformation) {
+function updateInstances(
+  scratchCards: ScratchCard[],
+  currentIndex: number,
+  score: number,
+  instances: number
+): void {
+  for (let z = 1; z <= score; z++) {
+    const index = z + currentIndex;
+
+    if (scratchCards[index]) {
+      scratchCards[index].instances += instances;
+    }
+  }
+}
+
+function computeMatchingNumbers(
+  scratchCardInformation: ScratchCardInformation
+) {
   const [winningNumbers, ourNumbers] = scratchCardInformation;
 
-  return ourNumbers.reduce((acc, n) => {
-    if (winningNumbers.includes(n)) {
-      return acc + 1;
-    }
-
-    return acc;
-  }, 0);
+  return ourNumbers.reduce(
+    (acc, ourNumber) => (winningNumbers.includes(ourNumber) ? acc + 1 : acc),
+    0
+  );
 }
