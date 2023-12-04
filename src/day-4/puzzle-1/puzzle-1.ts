@@ -1,44 +1,22 @@
 import { ScratchCardInformation } from "../types";
+import { getScratchCards } from "../utils/get-scratch-cards";
 
 export function Day4Puzzle1(input: string): number {
-  const scratchCardsInformation = getScratchCardsInformation(input);
+  const scratchCards = getScratchCards(input);
+  const scratchCardsInformation = scratchCards.map((i) => i.information);
   const scores = scratchCardsInformation.map((i) => {
     return getScratchCardScore(i);
   });
 
-  return scores.reduce((acc, s) => acc + s, 0);
-}
-
-function getScratchCardsInformation(input: string): ScratchCardInformation[] {
-  const information: ScratchCardInformation[] = [];
-
-  input.split("\n").forEach((line) => {
-    const numbers = line.split(":")[1];
-
-    const winningNumbers = numbers
-      .split("|")[0]
-      .split(" ")
-      .filter((v) => v !== "")
-      .map((v) => parseInt(v));
-
-    const ourNumbers = numbers
-      .split("|")[1]
-      .split(" ")
-      .filter((v) => v !== "")
-      .map((v) => parseInt(v));
-
-    information.push([winningNumbers, ourNumbers]);
-  });
-
-  return information;
+  return scores.reduce((acc, i) => acc + i, 0);
 }
 
 function getScratchCardScore(scratchCardInformation: ScratchCardInformation) {
   const [winningNumbers, ourNumbers] = scratchCardInformation;
 
   return ourNumbers.reduce(
-    (acc, n) => {
-      if (winningNumbers.includes(n)) {
+    (acc, i) => {
+      if (winningNumbers.includes(i)) {
         if (acc.counter === 0) acc.score = 1;
         else acc.score = acc.score * 2;
 

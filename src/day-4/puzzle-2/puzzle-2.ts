@@ -1,36 +1,10 @@
 import { ScratchCard, ScratchCardInformation } from "../types";
+import { getScratchCards } from "../utils/get-scratch-cards";
 
 export function Day4Puzzle2(input: string): number {
   const scratchCards = getScratchCards(input);
   const instances = computeScratchCardsInstances(scratchCards);
   return instances;
-}
-
-function getScratchCards(input: string): ScratchCard[] {
-  const scratchCards: ScratchCard[] = [];
-
-  input.split("\n").forEach((line) => {
-    const numbers = line.split(":")[1];
-
-    const winningNumbers = numbers
-      .split("|")[0]
-      .split(" ")
-      .filter((v) => v !== "")
-      .map((v) => parseInt(v));
-
-    const ourNumbers = numbers
-      .split("|")[1]
-      .split(" ")
-      .filter((v) => v !== "")
-      .map((v) => parseInt(v));
-
-    scratchCards.push({
-      instances: 1,
-      information: [winningNumbers, ourNumbers],
-    });
-  });
-
-  return scratchCards;
 }
 
 function computeScratchCardsInstances(scratchCards: ScratchCard[]): number {
