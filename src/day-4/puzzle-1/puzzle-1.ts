@@ -3,27 +3,29 @@ import { getScratchCards } from "../utils/get-scratch-cards";
 
 export function Day4Puzzle1(input: string): number {
   const scratchCards = getScratchCards(input);
-  const scratchCardsInformation = scratchCards.map((i) => i.information);
-  const scores = scratchCardsInformation.map((i) => {
-    return getScratchCardScore(i);
+  const scratchCardsInformation = scratchCards.map(
+    (scratchCard) => scratchCard.information
+  );
+  const scores = scratchCardsInformation.map((information) => {
+    return computeScratchCardScore(information);
   });
 
-  return scores.reduce((acc, i) => acc + i, 0);
+  return scores.reduce((acc, score) => acc + score, 0);
 }
 
-function getScratchCardScore(scratchCardInformation: ScratchCardInformation) {
+function computeScratchCardScore(
+  scratchCardInformation: ScratchCardInformation
+) {
   const [winningNumbers, ourNumbers] = scratchCardInformation;
 
   return ourNumbers.reduce(
-    (acc, i) => {
-      if (winningNumbers.includes(i)) {
-        if (acc.counter === 0) acc.score = 1;
-        else acc.score = acc.score * 2;
+    (acc, ourNumber) => {
+      if (!winningNumbers.includes(ourNumber)) return acc;
 
-        acc.counter = acc.counter + 1;
-      }
-
-      return acc;
+      return {
+        score: acc.counter === 0 ? 1 : acc.score * 2,
+        counter: acc.counter + 1,
+      };
     },
     { score: 0, counter: 0 }
   ).score;
