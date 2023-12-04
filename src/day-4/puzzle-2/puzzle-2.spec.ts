@@ -1,5 +1,5 @@
 import { Day4Puzzle2 } from "./puzzle-2";
-import { input as adventOfCodeInput } from "./input";
+import { input as adventOfCodeInput } from "../shared/input";
 
 describe("Day 4 Puzzle 2", () => {
   describe("Two games, one with one winning number and the second with zero winning number", () => {
